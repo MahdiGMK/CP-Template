@@ -403,41 +403,48 @@ struct FEN
     }
 };
 
+template <class Node>
 struct SEG
 {
-    struct Node
-    {
-        ll x = 0;
-    };
-    void merge(Node *a, Node *b, Node *res)
-    {
-        res->x = a->x + b->x;
-    }
-
     int n;
     Node *node;
 
-    SEG(const int &N, const int *A)
+    SEG(const int &N)
     {
         n = N + 1;
         node = new Node[n << 1];
+
         for (int i = 0; i < n; i++)
-            node[n + i].x = A[i];
+            node[n + i] = Node(NULL);
 
         for (int i = n; i--;)
-            merge(&node[i << 1], &node[i << 1 | 1], &node[i]);
+            Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
+    }
+    template <class Ty>
+    SEG(const int &N, const Ty *A)
+    {
+        n = N + 1;
+        node = new Node[n << 1];
+
+        for (int i = 0; i < n; i++)
+            node[n + i] = Node(A + i);
+
+        for (int i = n; i--;)
+            Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
     }
     ~SEG()
     {
         delete[] node;
     }
 
-    void upd(int i, const int &x)
+    template <class Ty>
+    void upd(int i, const Ty &x)
     {
         i += n;
-        node[i].x += x; // update
+        node[i].upd(x);
+
         for (; i >>= 1;)
-            merge(&node[i << 1], &node[i << 1 | 1], &node[i]);
+            Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
     }
     Node get(int l, int r)
     {
@@ -450,15 +457,46 @@ struct SEG
         for (; l < r; l >>= 1, r >>= 1)
         {
             if (l & 1)
-                merge(lres, &node[l++], lres_t), swap(lres, lres_t);
+                Node::merge(*lres, node[l++], *lres_t), swap(lres, lres_t);
             if (r & 1)
-                merge(&node[--r], rres, rres_t), swap(rres, rres_t);
+                Node::merge(node[--r], *rres, *rres_t), swap(rres, rres_t);
         }
-        merge(lres, rres, lres_t);
+        Node::merge(*lres, *rres, *lres_t);
         return *lres_t;
     }
 };
+template <class T>
+struct AdditionNode
+{
+    T x = 0;
+    AdditionNode() // null state
+    {
+    }
+    // template <class Ty>
+    AdditionNode(void *X) // filled
+    {
+        if (X != NULL)
+        {
+            // inputed node
+            T &val = *(T *)X;
+            x = val;
+        }
+        else
+        {
+            // default node
+        }
+    }
 
+    template <class Ty>
+    void upd(const Ty &u)
+    {
+        x += u;
+    }
+    static void merge(const AdditionNode<T> &a, const AdditionNode<T> &b, AdditionNode<T> &res)
+    {
+        res.x = a.x + b.x;
+    }
+};
 #pragma endregion
 
 // Template End
@@ -479,10 +517,14 @@ int main()
     }
 }
 
+int A[Max];
+
 void solve()
 {
     int n;
     cin >> n;
     // init_fac();
     // init_sieve();
+    SEG<AdditionNode<ll>> seg(n);
+    cout << seg.get(0, n).x << endl;
 }
