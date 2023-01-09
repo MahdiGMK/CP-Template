@@ -50,6 +50,8 @@ const ll Mod2 = 998244353;
 ll Mod = Mod1;
 const int Max = 1e6 + 10;
 const int MAX = 1e6 + 10;
+const int MaxSQ = 2e5 + 10;
+const int SQ = 500;
 const ll INF = 1LL * 1e18 + 10;
 const int Inf = 1e9 + 7;
 const int Log = 20;
@@ -447,7 +449,7 @@ struct SEG
         for (; i >>= 1;)
             Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
     }
-    void rngact(int l, int r, void (*act)(Node *))
+    void rangeact(int l, int r, void (*act)(Node *))
     {
         l += n, r += n;
         for (; l < r; l >>= 1, r >>= 1)
