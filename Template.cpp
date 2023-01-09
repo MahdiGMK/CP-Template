@@ -48,7 +48,7 @@ using minheap = priority_queue<T, vector<T>, greater<T>>;
 const ll Mod1 = 1e9 + 7;
 const ll Mod2 = 998244353;
 ll Mod = Mod1;
-const int Max = 4e5 + 10;
+const int Max = 1e6 + 10;
 const int MAX = 1e6 + 10;
 const ll INF = 1LL * 1e18 + 10;
 const int Inf = 1e9 + 7;
@@ -220,7 +220,7 @@ struct Tree
         Ch = new vector<int>[n + 5];
         Par = new int *[n + 5];
         Par[0] = new int[(n + 5) * Log];
-        for (int i = 0; i < n + 5; i++)
+        for (int i = 1; i < n + 5; i++)
         {
             Par[i] = Par[i - 1] + Log;
         }
@@ -446,6 +446,17 @@ struct SEG
         for (; i >>= 1;)
             Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
     }
+    void rngact(int l, int r, void (*act)(Node *))
+    {
+        l += n, r += n;
+        for (; l < r; l >>= 1, r >>= 1)
+        {
+            if (l & 1)
+                act(&node[l++]);
+            if (r & 1)
+                act(&node[--r]);
+        }
+    }
     Node get(int l, int r)
     {
         l += n, r += n;
@@ -525,6 +536,4 @@ void solve()
     cin >> n;
     // init_fac();
     // init_sieve();
-    SEG<AdditionNode<ll>> seg(n);
-    cout << seg.get(0, n).x << endl;
 }
