@@ -414,8 +414,9 @@ struct SEG
         n = N + 1;
         node = new Node[n << 1];
 
+        int *null = NULL;
         for (int i = 0; i < n; i++)
-            node[n + i] = Node(NULL);
+            node[n + i] = Node(null);
 
         for (int i = n; i--;)
             Node::merge(node[i << 1], node[i << 1 | 1], node[i]);
@@ -483,19 +484,16 @@ struct AdditionNode
     AdditionNode() // null state
     {
     }
-    // template <class Ty>
-    AdditionNode(void *X) // filled
+    template <class Ty>
+    AdditionNode(Ty *X) // filled
     {
-        if (X != NULL)
-        {
-            // inputed node
-            T &val = *(T *)X;
-            x = val;
-        }
-        else
+        if (X == NULL)
         {
             // default node
+            return;
         }
+        // inputed node
+        x = *X;
     }
 
     template <class Ty>
@@ -528,7 +526,7 @@ int main()
     }
 }
 
-int A[Max];
+int A[Max], B[Max], C[Max];
 
 void solve()
 {
