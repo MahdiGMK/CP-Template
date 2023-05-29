@@ -1,5 +1,8 @@
 #include <bits/stdc++.h>
 #include <iostream>
+#include <set>
+#include <utility>
+#include <vector>
 #pragma GCC optimize("O2")
 using namespace std;
 
@@ -50,6 +53,29 @@ const int SQ = 500;
 const ll INF = 1LL * 1e18 + 10;
 const int Inf = 1e9 + 7;
 const int Log = 20;
+#pragma region Defaults
+template <class A, class B, class C> struct triplet {
+    A first;
+    B second;
+    C third;
+
+    triplet<A, B, C>(A a, B b, C c) {
+        first = a;
+        second = b;
+        third = c;
+    }
+    bool operator<(const triplet<A, B, C> b) const {
+        if (first != b.first)
+            return first < b.first;
+        if (second != b.second)
+            return second < b.second;
+        return third < b.third;
+    }
+    bool operator==(const triplet<A, B, C> b) const {
+        return first == b.first && second == b.second && third == b.third;
+    }
+};
+#pragma endregion
 
 #pragma region Combinatorics
 struct mint;
@@ -254,6 +280,44 @@ struct Tree {
     inline int Dist(const int &a, const int &b) {
         int l = LCA(a, b);
         return H[a] + H[b] - (H[l] << 1);
+    }
+};
+
+// handles bracket tree for [l,r) ranges
+// also finds similar ranges in terms of containg ranges
+// st becomes maximal similar ranges
+// ch becomes child parent relation
+struct StaticBracketTree {
+    set<pii> st;
+    map<pii, vector<pii>> ch;
+
+    StaticBracketTree() {}
+
+    void addBracket(int l, int r) {
+        st.insert({l, -r});
+        ch[{l, r}] = vector<pii>();
+    }
+
+    void buildTree() {
+        auto iter = st.begin();
+        dfs(iter);
+    }
+
+    void dfs(set<pair<int, int>>::iterator &iter) {
+        int l = iter->first, r = -iter->second;
+
+        for (iter++; iter != st.end() && iter->first < r;) {
+            int cl = iter->first, cr = -iter->second;
+            if (cr > r) {
+                addBracket(cl, r);
+                addBracket(r, cr);
+                iter++;
+                st.erase({cl, -cr});
+            } else {
+                ch[{l, r}].push_back({cl, cr});
+                dfs(iter);
+            }
+        }
     }
 };
 
